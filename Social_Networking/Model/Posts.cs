@@ -64,34 +64,29 @@ namespace Social_Networking
                         contentPreference = user.Content;
                         break;
                     }
-                    else
-                    {
-                        isContentPreferenceSet = false;
-                    }
                 }
 
                 using (var dbContext = new UserDbContext())
                 {
-                    var query = dbContext.Post.AsQueryable();
                     if (isContentPreferenceSet)
                     {
-                        query = query.Where(u => u.Content == contentPreference);
+                        var query = dbContext.Post.Where(u => u.Content == contentPreference);
                         foreach (var post in query)
                         {
                             Console.WriteLine();
-                            Console.WriteLine($"{post.ID}).User:{post.Username} Time {post.DateTime.TimeOfDay}");
+                            Console.WriteLine($"User:{post.Username} Time {post.DateTime.TimeOfDay}  Content1 {post.Content}");
                             Console.WriteLine("");
                             Console.WriteLine($"{post.Post}");
                             Console.WriteLine("_______________");
                         }
                     }
-                    if(!isContentPreferenceSet)
+                    else
                     {
-                        var getMyPosts = query.ToList();
+                        var getMyPosts = dbContext.Post.ToList();
                         foreach (var post in getMyPosts)
                         {
                             Console.WriteLine();
-                            Console.WriteLine($"{post.ID}).User:{post.Username} Time {post.DateTime.TimeOfDay}");
+                            Console.WriteLine($"User:{post.Username} Time {post.DateTime.TimeOfDay}  content2 {post.Content}");
                             Console.WriteLine("");
                             Console.WriteLine($"{post.Post}");
                             Console.WriteLine("_______________");
@@ -104,6 +99,7 @@ namespace Social_Networking
                 Console.WriteLine(ex.Message);
             }
         }
+
         public void Delete_My_Post()
         {
             try

@@ -1,6 +1,7 @@
 ﻿using Social_Networking;
 using Social_Networking.Data;
 using Social_Networking.Migrations;
+using Social_Networking.Model;
 using System;
 using static Social_Networking.Exceptions.Exceptions;
 
@@ -65,11 +66,13 @@ public class Main_Functional
     {
         try
         {
-            while (true)
+            bool whilee = true;    
+            while (whilee)
             {
 
                 Posts posts = new Posts();
                 User user1 = new User();
+                FollowUsers f = new FollowUsers();
                 string username = "";
                 foreach (var user in Posts.Users_List)
                 {
@@ -82,11 +85,13 @@ public class Main_Functional
                 Console.WriteLine("3.Delete Posts");
                 Console.WriteLine("4.See My Posts Posts");
                 Console.WriteLine("5.Settings");
+                Console.WriteLine("6.Exit From Account!");
+                Console.WriteLine("7.Friends!");
                 int PostChoice = Convert.ToInt32(Console.ReadLine());
                 switch (PostChoice)
                 {
                     case 1:
-                        posts.See_My_Posts();
+                        posts.For_You_Page();
                         break;
                     case 2:
                         posts.Write_Post();
@@ -100,6 +105,13 @@ public class Main_Functional
                     case 5:
                         user1.Setings();
                         break;
+                    case 6:
+                        user1.ExitFromAccount();
+                        whilee = false;
+                        break;
+                    case 7: f.Friends_Adjustment();
+                        break;
+
                     default:
                         Console.WriteLine("Invalid choice. Please choose a number between 1 and 4.");
                         break;

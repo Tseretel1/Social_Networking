@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Social_Networking.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,9 @@ namespace Social_Networking.Data
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Posts> Post { get; set; }
+
+        public DbSet<Friends> Friends { get; set; }
+        public DbSet<FollowUsers> Follows { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -17,11 +17,10 @@ namespace Social_Networking
         public string Name { get; set; }
         public string Lastaname { get; set; }
         public int Age { get; set; }
-        public int ID { get; set; } 
+        public int ID { get; set; }
         public bool isonline { get; set; }
-        public string Content { get; set; } 
-
-        public void Registration()
+        public string Content { get; set; }
+         public void Registration()
         {
             try
             {
@@ -68,6 +67,7 @@ namespace Social_Networking
                                 Email = Email,
                                 UserName = UserName,
                                 Password = Password,
+                                Content = "All Together",
                             };
                             context.Users.Add(user);
                             context.SaveChanges();
@@ -121,7 +121,6 @@ namespace Social_Networking
                                 age = userToUpdate.Age;
                                 user_id = userToUpdate.ID;
                                 Posts.Users_List.Add(userToUpdate);
-
                             }
                         }
                         else
@@ -145,7 +144,7 @@ namespace Social_Networking
                 try
                 {
                     Console.WriteLine();
-                    Console.WriteLine("Choose Preferred Content For Foryou Page!");
+                    Console.WriteLine("Choose Preferred Content For For you Page!");
                     Console.WriteLine("1. Music");
                     Console.WriteLine("2. Films");
                     Console.WriteLine("3. Games");
@@ -209,7 +208,7 @@ namespace Social_Networking
         }
         public void UserName_Password_Changing()
         {
-
+            //
         }
         public void Setings()
         {
@@ -247,6 +246,10 @@ namespace Social_Networking
                     Console.WriteLine(ex.Message);
                 }
             }
-        }            
+        }
+        public void ExitFromAccount()
+        {
+            Posts.Users_List.Clear();
+        }
     }
  }

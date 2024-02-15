@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Social_Networking.Data;
+using Social_Networking.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace Social_Networking
         public int ID { get; set; }
         public bool isonline { get; set; }
         public string Content { get; set; }
+        public virtual List<Messages> messages { get; set; }
          public void Registration()
         {
             try

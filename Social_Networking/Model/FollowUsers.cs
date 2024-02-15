@@ -18,55 +18,6 @@ namespace Social_Networking.Model
         public string SenderUSername { get; set; }
         public string RecieverString { get; set; }
 
-
-
-
-        public void Friends_Adjustment()
-        {
-            try 
-            {
-
-                bool Till_Exit = true;
-                while (Till_Exit)
-                {
-                    using (var dbContext = new UserDbContext())
-                    {
-                        var currentUser = Posts.Users_List.FirstOrDefault();
-                        var userFriendCount = dbContext.Friends
-                            .Where(u => u.UserId1 == currentUser.ID || u.UserId2 == currentUser.ID)
-                            .Count();
-
-                        Console.WriteLine($"1. Friends: {userFriendCount}");
-
-                        Console.WriteLine("2. Follow");
-                        Console.WriteLine("3. Friend Requests");
-                        Console.WriteLine("4.Exit!");
-                        int Choice = Convert.ToInt32(Console.ReadLine());
-
-                        switch( Choice )
-                        {
-                            case 1: Friends();
-                                break;
-                            case 2:
-                                Follow();
-                                break;
-                            case 3:
-                                FriendRequests();
-                                break;
-                            case 4:
-                                Till_Exit = false;
-                                break;
-                        }
-
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
         public void Follow()
         {
             try
@@ -90,10 +41,11 @@ namespace Social_Networking.Model
                         else
                         {
                             bool if_followexists = dbContext.Follows.Any(u => u.SenderID == currentUser.ID && u.RecieverID == userToFollow.ID);
-                            if (!if_followexists)
+                            bool if_Already_Freinds = dbContext.Friends.Any(u => u.UserId1 == currentUser.ID && u.UserId2 == userToFollow.ID || u.UserId1 == userToFollow.ID && u.UserId2 == currentUser.ID);
+                            if (!if_followexists && !if_Already_Freinds)
                             {
                                 Console.WriteLine($"You Followed {userNameToFollow}");
-                                Console.WriteLine($"Now You can Chat With {userNameToFollow}. See Their Posts and Comments!");
+                                Console.WriteLine($"Now You can See {userNameToFollow}'s Posts and Comments!");
 
                                 var follow = new FollowUsers()
                                 {
@@ -108,8 +60,17 @@ namespace Social_Networking.Model
                             }
                             else
                             {
-                                Console.WriteLine($"You Already Follow {userToFollow.UserName}");
-                                break;
+                                if (if_Already_Freinds)
+                                {
+                                    Console.WriteLine($"You Are Already Friends With {userToFollow.UserName}!");
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"You Already Follow {userToFollow.UserName}");
+                                    break;
+                                }
+                             
                             }
                         }
                     }
@@ -120,7 +81,7 @@ namespace Social_Networking.Model
                 Console.WriteLine(ex.Message);
             }
         }
-        public void FriendRequests()
+        public void Follow_Requests()
         {
             try
             {
@@ -161,7 +122,7 @@ namespace Social_Networking.Model
                     }
                     else
                     {
-                        Console.WriteLine("User With Given id Does not exist or the friend request does not match the current user!");
+                        Console.WriteLine("ID does not match the friend request user!");
                     }
                 }
             }
@@ -218,46 +179,26 @@ namespace Social_Networking.Model
 
         private void Reject(int requestId)
         {
-            Console.WriteLine($"Friend request with ID {requestId} rejected.");
-        }
-
-        public void Friends()
-        {
             try
             {
-                bool tillExit = false;
-                while (!tillExit)
+                var currentUser = Posts.Users_List.FirstOrDefault();
+                using (var dbContext = new UserDbContext())
                 {
-                    using (var dbContext = new UserDbContext())
+                    var befriended = dbContext.Follows
+                        .Where(u => u.ID == requestId && u.RecieverID == currentUser.ID && u.RecieverString == currentUser.UserName)
+                        .ToList();
+                    foreach (var item in befriended)
                     {
-                        var currentUser = Posts.Users_List.FirstOrDefault();
-
-                        var friendNames = dbContext.Friends
-                            .Where(u => u.UserId1 == currentUser.ID || u.UserId2 == currentUser.ID)
-                            .Select(u => u.UserId1 == currentUser.ID ? u.UserName2 : u.UserName1)
-                            .ToList();
-
-                        foreach (var userName in friendNames)
-                        {
-                            Console.WriteLine(userName);
-                        }
-
-                        Console.WriteLine("Press 'E' to exit or any other key to continue displaying friends.");
-                        string userInput = Console.ReadLine();
-
-                        if (userInput.ToUpper() == "E")
-                        {
-                            tillExit = true;
-                        }
+                        dbContext.Follows .Remove(item);
                     }
+                    dbContext.SaveChanges();
+                    Console.WriteLine($"Friend request with ID {requestId} rejected.");
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
-
-
     }
 }

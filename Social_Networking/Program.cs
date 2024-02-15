@@ -73,6 +73,8 @@ public class Main_Functional
                 Posts posts = new Posts();
                 User user1 = new User();
                 FollowUsers f = new FollowUsers();
+                Friends friends = new Friends();
+                Messages messages = new Messages();
                 string username = "";
                 foreach (var user in Posts.Users_List)
                 {
@@ -85,8 +87,8 @@ public class Main_Functional
                 Console.WriteLine("3.Delete Posts");
                 Console.WriteLine("4.See My Posts Posts");
                 Console.WriteLine("5.Settings");
-                Console.WriteLine("6.Exit From Account!");
-                Console.WriteLine("7.Friends!");
+                Console.WriteLine("6.Friends!");
+                Console.WriteLine("7.Exit From Account!");
                 int PostChoice = Convert.ToInt32(Console.ReadLine());
                 switch (PostChoice)
                 {
@@ -103,13 +105,13 @@ public class Main_Functional
                         posts.See_My_Posts();
                         break;
                     case 5:
-                        user1.Setings();
+                        messages.Chats_Friends();
                         break;
-                    case 6:
+                    case 6:friends.Friends_Adjustment();
+                        break;
+                    case 7:
                         user1.ExitFromAccount();
                         whilee = false;
-                        break;
-                    case 7: f.Friends_Adjustment();
                         break;
 
                     default:

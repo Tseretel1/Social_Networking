@@ -140,17 +140,17 @@ namespace Social_Networking
         }
         public void ContentPreference()
         {
-            bool whilee = true;
-            while (whilee)
+            bool TillExit = true;
+            while (TillExit)
             {
                 try
                 {
                     Console.WriteLine();
-                    Console.WriteLine("Choose Preferred Content For For you Page!");
+                    Console.WriteLine("Choose Preferred Content For Your Page!");
                     Console.WriteLine("1. Music");
                     Console.WriteLine("2. Films");
                     Console.WriteLine("3. Games");
-                    Console.WriteLine("4. All Together");
+                    Console.WriteLine("4. None");
                     Console.WriteLine("5. Exit");
 
                     int chosenContent = Convert.ToInt32(Console.ReadLine());
@@ -171,36 +171,43 @@ namespace Social_Networking
                             Console.WriteLine($"Content Preference set to {content}");
                             break;
                         case 4:
-                            content = "All Together";
-                            Console.WriteLine($"Content Preference set to {content}");
+                            content = "";
+                            Console.WriteLine($"Content Preference set to None");
                             break;
                         case 5:
-                            whilee = false;
+                            TillExit = false;
                             break;
                         default:
                             Console.WriteLine("Invalid choice. Please choose a number between 1 and 4.");
-                            continue;
+                            break;
                     }
 
-                    using (var dbContext = new UserDbContext())
+                    if (chosenContent >= 1 && chosenContent <= 4)
                     {
-                        foreach (var user in Posts.Users_List)
+                        var currentUser = Posts.Users_List.FirstOrDefault();
+                        if (currentUser != null)
                         {
-                            user.Content = content;
-                            var existingUser = dbContext.Users.SingleOrDefault(u => u.UserName == user.UserName);
+                            using (var dbContext = new UserDbContext())
+                            {
+                                var existingUser = dbContext.Users.SingleOrDefault(u => u.UserName == currentUser.UserName);
 
-                            if (existingUser != null)
-                            {
-                                existingUser.Content = user.Content;
-                            }
-                            else
-                            {
-                                Console.WriteLine($"User with username {user.UserName} not found in the database.");
+                                if (existingUser != null)
+                                {
+                                    existingUser.Content = content;
+                                    dbContext.SaveChanges();
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"User with username {currentUser.UserName} not found in the database.");
+                                }
                             }
                         }
-
-                        dbContext.SaveChanges();
+                        else
+                        {
+                            Console.WriteLine("Current user not found.");
+                        }
                     }
+
                 }
                 catch (Exception ex)
                 {
@@ -210,7 +217,6 @@ namespace Social_Networking
         }
         public void UserName_Password_Changing()
         {
-            //
         }
         public void Setings()
         {

@@ -16,6 +16,7 @@ namespace Social_Networking.Model
         public string Message { get; set; }
         public int ReceiverID { get; set; }
         public string ReceiverUserName { get; set; }
+        public string Seen { get; set; }
         public virtual List<User> Users { get; set; }
 
 
@@ -36,21 +37,27 @@ namespace Social_Networking.Model
                         {
                             string userNotme = "";
                             int userid = 0;
-                            if(userName.UserName1!= currentUser.UserName)
+                            int MessageCount = 0;
+                            if (userName.UserName1 != currentUser.UserName)
                             {
                                 userNotme = userName.UserName1;
                                 userid = userName.UserId1;
+
                             }
-                            else if(userName.UserName2 != currentUser.UserName)
+                            else if (userName.UserName2 != currentUser.UserName)
                             {
                                 userNotme = userName.UserName2;
                                 userid = userName.UserId2;
+
                             }
                             Console.WriteLine();
-                            Console.WriteLine($"ID {userid} {userNotme}");
+                            Console.Write($"{userid}. {userNotme}");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"  +{MessageCount}");
+                            Console.ResetColor();
+
                         }
                         tillExit = false;
-
                         Message_Friend();
                     }
                 }
@@ -84,53 +91,68 @@ namespace Social_Networking.Model
                     {
                         foreach (var item in friendMessages)
                         {
+                            Console.WriteLine();
                             if (item.SenderID == FriendID && item.ReceiverID == currentUser.ID)
                             {
-                                Console.WriteLine();
+                                Console.ForegroundColor = ConsoleColor.Blue;
                                 Console.WriteLine($"-{item.Message}");
+                                Console.ResetColor();
                             }
                             else if (item.SenderID == currentUser.ID && item.ReceiverID == FriendID)
                             {
-                                Console.WriteLine();
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
                                 Console.WriteLine($"            -{item.Message}");
+                                Console.ResetColor();
                             }
                         }
+
                     }
 
 
 
 
                     bool FriendsOrNOT = dbContext.Friends.Any(u => u.UserId1 == FriendID && u.UserId2 == currentUser.ID || u.UserId2 == FriendID && u.UserId1 == currentUser.ID);
-                    string typeMessage = Console.ReadLine();
-                    if (!string.IsNullOrEmpty(typeMessage) && typeMessage.Trim() != "" && FriendsOrNOT)
-                    {
-
-                        var friendUsernameFind = dbContext.Users.FirstOrDefault(u => u.ID == FriendID);
-                        string friendsName = "";
-                        if (friendUsernameFind != null)
-                        {
-                            friendsName = friendUsernameFind.UserName;
-                        }
-
-                        Messages newMessage = new Messages()
-                        {
-                            SenderID = currentUser.ID,
-                            ReceiverID = FriendID,
-                            SenderUserName = currentUser.UserName,
-                            ReceiverUserName = friendsName,
-                            Message = typeMessage,
-                        };
-
-                        dbContext.Messages.Add(newMessage);
-                        dbContext.SaveChanges();
-                    }
-                    else if(!FriendsOrNOT)
+                    if(!FriendsOrNOT)
                     {
                         Console.WriteLine("ID is incorrect or You are not Friends With User with This ID!");
                     }
                     else
                     {
-                        Console.WriteLine("You can't send an empty message.");
+                        bool till_exit = true;
+                        while (till_exit)
+                        {
+                            int middleX = Console.WindowWidth / 2 - 47;
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.SetCursorPosition(middleX, Console.CursorTop);
+                            string typeMessage = Console.ReadLine();
+                            Console.ResetColor();
+                            if(typeMessage == "")
+                            {
+                                till_exit = false;
+                            }
+                            else
+                            {
+                                var friendUsernameFind = dbContext.Users.FirstOrDefault(u => u.ID == FriendID);
+                                string friendsName = "";
+                                if (friendUsernameFind != null)
+                                {
+                                    friendsName = friendUsernameFind.UserName;
+                                }
+
+                                Messages newMessage = new Messages()
+                                {
+                                    SenderID = currentUser.ID,
+                                    ReceiverID = FriendID,
+                                    SenderUserName = currentUser.UserName,
+                                    ReceiverUserName = friendsName,
+                                    Message = typeMessage,
+                                    Seen = "Not seen",
+                                };
+
+                                dbContext.Messages.Add(newMessage);
+                                dbContext.SaveChanges();
+                            }                  
+                        }
                     }
 
                 }

@@ -53,46 +53,69 @@ namespace Social_Networking
         {
             try
             {
-                bool isContentPreferenceSet = false;
-                string contentPreference = "";
-
-                foreach (var user in Users_List)
-                {
-                    if (user.Content != null)
-                    {
-                        isContentPreferenceSet = true;
-                        contentPreference = user.Content;
-                        break;
-                    }
-                }
 
                 using (var dbContext = new UserDbContext())
                 {
-                    if (isContentPreferenceSet)
+                    string contentPreference = "";
+                    int CurrentUSerID = 0;
+                    foreach(var i in Users_List)
+                    {
+                       CurrentUSerID = i.ID;
+                    }
+                    var UserContent = dbContext.Users.FirstOrDefault(u => u.ID == CurrentUSerID);
+                    contentPreference = UserContent.Content;
+
+                    if (contentPreference != "")
                     {
                         var query = dbContext.Post.Where(u => u.Content == contentPreference);
                         foreach (var post in query)
                         {
                             Console.WriteLine();
-                            Console.WriteLine($"User:{post.Username} Time {post.DateTime.TimeOfDay}  Content1 {post.Content}");
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.Write($"{post.Username} :");
+                            Console.ResetColor();
+                            Console.Write($" Time {post.DateTime.TimeOfDay} Content");
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine($" {post.Content}");
+                            Console.ResetColor();
                             Console.WriteLine("");
-                            Console.WriteLine($"{post.Post}");
-                            Console.WriteLine("_______________");
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"-{post.Post}");
+                            Console.ResetColor();
+                            Console.WriteLine("");
                         }
                     }
-                    else
+                    else if(contentPreference == "")
                     {
-                        var getMyPosts = dbContext.Post.ToList();
-                        foreach (var post in getMyPosts)
+                        var GetEveryPost = dbContext.Post.Where(u=> u.Content == u.Content);
+                        string PostContent = "";
+                        foreach (var post in GetEveryPost)
                         {
+                            if(post.Content == "")
+                            {
+                                PostContent = "None";
+                            }
+                            else
+                            {
+                                PostContent = post.Content;
+                            }
                             Console.WriteLine();
-                            Console.WriteLine($"User:{post.Username} Time {post.DateTime.TimeOfDay}  content2 {post.Content}");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write($"{post.Username} :");
+                            Console.ResetColor();
+                            Console.Write($" Time {post.DateTime.TimeOfDay} Content");
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine($" {PostContent}");
+                            Console.ResetColor();
                             Console.WriteLine("");
-                            Console.WriteLine($"{post.Post}");
-                            Console.WriteLine("_______________");
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"-{post.Post}");
+                            Console.ResetColor();
+                            Console.WriteLine("");
                         }
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -114,7 +137,10 @@ namespace Social_Networking
                         foreach (var post in Get_My_Posts)
                         {
                             Console.WriteLine();
-                            Console.WriteLine($"{post.ID}).User:{post.Username} Time {post.DateTime.TimeOfDay}");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write($"{post.ID}).");
+                            Console.ResetColor();
+                            Console.WriteLine($"{post.Username} Time {post.DateTime.TimeOfDay}");
                             Console.WriteLine($"");
                             Console.WriteLine($"{post.Post}");
                             Console.WriteLine($"_______________");
@@ -123,20 +149,83 @@ namespace Social_Networking
                 }
                 Console.WriteLine("Enter Post Number To Delete");
                 int PostDelete = Convert.ToInt32(Console.ReadLine());
-
+                var currentUser = Posts.Users_List.FirstOrDefault();
                 using (var dbContext = new UserDbContext())
                 {
-                    var postToDelete = dbContext.Post.SingleOrDefault(u => u.ID == PostDelete);
-
-                    if (postToDelete != null)
+                    bool IsMyPost = dbContext.Post.Any(u => u.ID == PostDelete && u.UserId == currentUser.ID);
+                    if (IsMyPost)
                     {
-                        dbContext.Post.Remove(postToDelete);
-                        dbContext.SaveChanges();
-                        Console.WriteLine("Post deleted successfully.");
+                        var postToDelete = dbContext.Post.SingleOrDefault(u => u.ID == PostDelete);
+
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Are You Sure To delete This Post?");
+                        Console.ResetColor();
+
+                        var Get_My_Posts = dbContext.Post.Where(u => u.ID == PostDelete).ToList();
+                        foreach (var post in Get_My_Posts)
+                        {
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write($"{post.ID}).");
+                            Console.ResetColor();
+                            Console.WriteLine($"{post.Username} Time {post.DateTime.TimeOfDay}");
+                            Console.WriteLine($"");
+                            Console.WriteLine($"{post.Post}");
+                            Console.WriteLine($"_______________");
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("1.Yes Delete!");
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("2.No Im Not Sure");
+                        Console.ResetColor();
+                        int Sure_Ornot = Convert.ToInt32(Console.ReadLine());
+                        if (Sure_Ornot == 1)
+                        {
+                            if (postToDelete != null)
+                            {
+                                dbContext.Post.Remove(postToDelete);
+                                dbContext.SaveChanges();
+                                Console.WriteLine();
+                                Console.ForegroundColor= ConsoleColor.Green;
+                                Console.WriteLine("Post deleted successfully.");
+                                Console.ResetColor();
+                                Console.WriteLine();
+                            }
+                            else
+                            {
+                                Console.WriteLine();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Post with given id does not exist!");
+                                Console.ResetColor();
+                                Console.WriteLine();
+                            }
+                        }
+                        else if (Sure_Ornot == 2)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Declined!");
+                            Console.WriteLine();
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Incorrect input Post Did not Deleted!");
+                            Console.ResetColor();
+                            Console.WriteLine();
+                        }
                     }
                     else
                     {
-                        Console.WriteLine("Post with given id does not exist!");
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Post Id is Incorrect!");
+                        Console.ResetColor();
+                        Console.WriteLine();
                     }
                 }
             }
@@ -160,7 +249,7 @@ namespace Social_Networking
                         Console.WriteLine("1. Music");
                         Console.WriteLine("2. Films");
                         Console.WriteLine("3. Games");
-                        Console.WriteLine("4. All Together");
+                        Console.WriteLine("4. None");
                         Console.WriteLine("5. Exit");
 
                         int chosenContent = Convert.ToInt32(Console.ReadLine());
@@ -178,7 +267,7 @@ namespace Social_Networking
                                 content = "Games";
                                 break;
                             case 4:
-                                content = "All Together";
+                                content = "";
                                 break;
                             default:
                                 Console.WriteLine("Invalid choice. Please choose a number between 1 and 4.");

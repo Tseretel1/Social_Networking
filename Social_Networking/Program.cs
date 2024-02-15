@@ -86,9 +86,10 @@ public class Main_Functional
                 Console.WriteLine("2.Write  Posts");
                 Console.WriteLine("3.Delete Posts");
                 Console.WriteLine("4.See My Posts Posts");
-                Console.WriteLine("5.Settings");
+                Console.WriteLine("5.Settings");            
                 Console.WriteLine("6.Friends!");
-                Console.WriteLine("7.Exit From Account!");
+                Console.WriteLine("7.Chat");
+                Console.WriteLine("8.Exit From Account!");
                 int PostChoice = Convert.ToInt32(Console.ReadLine());
                 switch (PostChoice)
                 {
@@ -105,11 +106,14 @@ public class Main_Functional
                         posts.See_My_Posts();
                         break;
                     case 5:
-                        messages.Chats_Friends();
+                        user1.Setings();
                         break;
                     case 6:friends.Friends_Adjustment();
                         break;
                     case 7:
+                        messages.Chats_Friends();
+                        break;
+                    case 8:
                         user1.ExitFromAccount();
                         whilee = false;
                         break;

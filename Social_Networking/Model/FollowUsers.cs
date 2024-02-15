@@ -106,8 +106,12 @@ namespace Social_Networking.Model
 
                     if (respond)
                     {
+                        Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("1. Accept");
+                        Console.ResetColor();
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("2. Reject");
+                        Console.ResetColor();
                         int acceptOrReject = Convert.ToInt32(Console.ReadLine());
 
                         switch (acceptOrReject)

@@ -36,9 +36,15 @@ namespace Social_Networking.Model
                           .Where(u => u.RecieverID == currentUser.ID)
                           .Count();
 
-                        Console.WriteLine($"1. Friends: {userFriendCount}");
+                        Console.Write($"1. Friends:");
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($" {userFriendCount}");
+                        Console.ResetColor();
                         Console.WriteLine("2. Follow People");
-                        Console.WriteLine($"3. Friend Requests: {UserFollowCount}");
+                        Console.Write($"3. Friend Requests:");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($" +{UserFollowCount}");
+                        Console.ResetColor();
                         Console.WriteLine("4.Exit!");
                         int Choice = Convert.ToInt32(Console.ReadLine());
 
@@ -84,13 +90,12 @@ namespace Social_Networking.Model
 
                         foreach (var userName in friendNames)
                         {
+                            Console.WriteLine();
                             Console.WriteLine(userName);
                         }
-
-                        Console.WriteLine("Press 'X' to exit or any other key to continue displaying friends.");
                         string userInput = Console.ReadLine();
 
-                        if (userInput.ToUpper() == "X")
+                        if (userInput=="")
                         {
                             tillExit = true;
                         }

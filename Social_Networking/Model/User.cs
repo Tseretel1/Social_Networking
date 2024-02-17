@@ -69,7 +69,7 @@ namespace Social_Networking
                                 Email = Email,
                                 UserName = UserName,
                                 Password = Password,
-                                Content = "All Together",
+                                Content = "",
                             };
                             context.Users.Add(user);
                             context.SaveChanges();

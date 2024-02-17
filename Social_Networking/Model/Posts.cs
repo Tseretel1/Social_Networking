@@ -33,12 +33,29 @@ namespace Social_Networking
                     using (var dbContext = new UserDbContext())
                     {
                         var Get_My_Posts = dbContext.Post.Where(u => u.UserId == userId).ToList();
+                        string content = "";
                         foreach (var post in Get_My_Posts)
                         {
+                           if(post.Content== "")
+                            {
+                                content = "None";
+                            }
+                            else
+                            {
+                                content = post.Content;
+                            }
                             Console.WriteLine();
-                            Console.WriteLine($"User:{post.Username} Time {post.DateTime.TimeOfDay}");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write($"{post.Username}");
+                            Console.ResetColor();
+                            Console.Write($"Time {post.DateTime.TimeOfDay} content");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($" {content}");
+                            Console.ResetColor();
                             Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
                             Console.WriteLine($"{post.Post}");
+                            Console.ResetColor();
                             Console.WriteLine("______________");
                         }
                     }

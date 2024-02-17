@@ -85,7 +85,7 @@ public class Main_Functional
                 Console.WriteLine("1.ForYou Page") ;
                 Console.WriteLine("2.Write  Posts");
                 Console.WriteLine("3.Delete Posts");
-                Console.WriteLine("4.See My Posts Posts");
+                Console.WriteLine("4.See My Posts");
                 Console.WriteLine("5.Settings");            
                 Console.WriteLine("6.Friends!");
                 Console.WriteLine("7.Chat");

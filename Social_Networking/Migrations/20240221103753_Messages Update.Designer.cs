@@ -12,8 +12,8 @@ using Social_Networking.Data;
 namespace Social_Networking.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240215190335_Seen Feature")]
-    partial class SeenFeature
+    [Migration("20240221103753_Messages Update")]
+    partial class MessagesUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,21 +25,6 @@ namespace Social_Networking.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("MessagesUser", b =>
-                {
-                    b.Property<int>("UsersID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("messagesID")
-                        .HasColumnType("int");
-
-                    b.HasKey("UsersID", "messagesID");
-
-                    b.HasIndex("messagesID");
-
-                    b.ToTable("MessagesUser");
-                });
-
             modelBuilder.Entity("Social_Networking.Model.FollowUsers", b =>
                 {
                     b.Property<int>("ID")
@@ -49,6 +34,9 @@ namespace Social_Networking.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int?>("FriendsID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MessagesID")
                         .HasColumnType("int");
 
                     b.Property<int>("RecieverID")
@@ -68,6 +56,8 @@ namespace Social_Networking.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("FriendsID");
+
+                    b.HasIndex("MessagesID");
 
                     b.ToTable("Follows");
                 });
@@ -111,25 +101,29 @@ namespace Social_Networking.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReceiverID")
+                    b.Property<int>("RecieverID")
                         .HasColumnType("int");
 
-                    b.Property<string>("ReceiverUserName")
+                    b.Property<string>("RecieverUserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Seen")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("Seen")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SenderID")
                         .HasColumnType("int");
 
-                    b.Property<string>("SenderUserName")
+                    b.Property<string>("SenderUsername")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("ID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Messages");
                 });
@@ -216,31 +210,37 @@ namespace Social_Networking.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MessagesUser", b =>
-                {
-                    b.HasOne("Social_Networking.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Social_Networking.Model.Messages", null)
-                        .WithMany()
-                        .HasForeignKey("messagesID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Social_Networking.Model.FollowUsers", b =>
                 {
                     b.HasOne("Social_Networking.Model.Friends", null)
                         .WithMany("Users_Friends")
                         .HasForeignKey("FriendsID");
+
+                    b.HasOne("Social_Networking.Model.Messages", null)
+                        .WithMany("Message_List")
+                        .HasForeignKey("MessagesID");
+                });
+
+            modelBuilder.Entity("Social_Networking.Model.Messages", b =>
+                {
+                    b.HasOne("Social_Networking.User", null)
+                        .WithMany("messages")
+                        .HasForeignKey("UserID");
                 });
 
             modelBuilder.Entity("Social_Networking.Model.Friends", b =>
                 {
                     b.Navigation("Users_Friends");
+                });
+
+            modelBuilder.Entity("Social_Networking.Model.Messages", b =>
+                {
+                    b.Navigation("Message_List");
+                });
+
+            modelBuilder.Entity("Social_Networking.User", b =>
+                {
+                    b.Navigation("messages");
                 });
 #pragma warning restore 612, 618
         }

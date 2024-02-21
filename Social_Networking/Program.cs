@@ -9,13 +9,39 @@ class Program
 {
     static void Main()
     {
+
+        AppDomain.CurrentDomain.ProcessExit += new EventHandler(Main_Functional.ProcessExitHandler);
         Main_Functional main = new Main_Functional();
         main.Func();
     }
 }
-
 public class Main_Functional
 {
+    public static void ProcessExitHandler(object sender, EventArgs e)
+    {
+        Closing_Porgram();
+    }
+
+    public static void Closing_Porgram()
+    {
+        string Username = "";
+        foreach (var user in Posts.Users_List)
+        {
+            Username = user.UserName;
+        }
+
+        using (var dbContext = new UserDbContext())
+        {
+            var userToUpdate = dbContext.Users.FirstOrDefault(u => u.UserName == Username);
+
+            if (userToUpdate != null)
+            {
+                userToUpdate.isonline = false;
+                dbContext.SaveChanges();
+            }
+        }
+        Posts.Users_List.Clear();
+    }
     public void Func()
     {
         while (true)
@@ -62,12 +88,12 @@ public class Main_Functional
         }
     }
 
-    public void Post_Managment() 
+    public void Post_Managment()
     {
-        try
+        bool whilee = true;
+        while (whilee)
         {
-            bool whilee = true;    
-            while (whilee)
+            try
             {
 
                 Posts posts = new Posts();
@@ -78,15 +104,15 @@ public class Main_Functional
                 string username = "";
                 foreach (var user in Posts.Users_List)
                 {
-                   username =  user.UserName;
+                    username = user.UserName;
                 }
                 Console.WriteLine($"Welcome {username}!");
                 Console.WriteLine();
-                Console.WriteLine("1.ForYou Page") ;
+                Console.WriteLine("1.ForYou Page");
                 Console.WriteLine("2.Write  Posts");
                 Console.WriteLine("3.Delete Posts");
                 Console.WriteLine("4.See My Posts");
-                Console.WriteLine("5.Settings");            
+                Console.WriteLine("5.Settings");
                 Console.WriteLine("6.Friends!");
                 Console.WriteLine("7.Chat");
                 Console.WriteLine("8.Exit From Account!");
@@ -108,10 +134,11 @@ public class Main_Functional
                     case 5:
                         user1.Setings();
                         break;
-                    case 6:friends.Friends_Adjustment();
+                    case 6:
+                        friends.Friends_Adjustment();
                         break;
                     case 7:
-                        messages.Chats_Friends();
+                        messages.Chat_Display();
                         break;
                     case 8:
                         user1.ExitFromAccount();
@@ -123,11 +150,12 @@ public class Main_Functional
                         break;
                 }
             }
-        }
-        
-        catch(Exception ex)
-        {
-            Console.WriteLine(ex.Message);
+
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

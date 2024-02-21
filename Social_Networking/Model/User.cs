@@ -113,7 +113,8 @@ namespace Social_Networking
                             int age = 0;
                             int user_id = 0;
                             var userToUpdate = dbContext.Users.FirstOrDefault(u => u.UserName == username);
-
+                            userToUpdate.isonline = true;
+                            dbContext.SaveChanges();
                             if (userToUpdate != null)
                             {
                                 username = userToUpdate.UserName;
@@ -122,6 +123,7 @@ namespace Social_Networking
                                 email = userToUpdate.Email;
                                 age = userToUpdate.Age;
                                 user_id = userToUpdate.ID;
+                                userToUpdate.isonline = true;
                                 Posts.Users_List.Add(userToUpdate);
                             }
                         }
@@ -257,6 +259,17 @@ namespace Social_Networking
         }
         public void ExitFromAccount()
         {
+            string Usenrame = "";
+            foreach(var user in Posts.Users_List)
+            {
+                Usenrame = user.UserName;
+            }
+            using (var dbContext = new UserDbContext())
+            {
+                var userToUpdate = dbContext.Users.FirstOrDefault(u => u.UserName == Usenrame);
+                userToUpdate.isonline = false;
+                dbContext.SaveChanges();
+            }
             Posts.Users_List.Clear();
         }
     }

@@ -42,7 +42,8 @@ namespace Social_Networking.Model
                         {
                             bool if_followexists = dbContext.Follows.Any(u => u.SenderID == currentUser.ID && u.RecieverID == userToFollow.ID);
                             bool if_Already_Freinds = dbContext.Friends.Any(u => u.UserId1 == currentUser.ID && u.UserId2 == userToFollow.ID || u.UserId1 == userToFollow.ID && u.UserId2 == currentUser.ID);
-                            if (!if_followexists && !if_Already_Freinds)
+                            bool if_User_Is_Me = dbContext.Users.Any(u => u.UserName == currentUser.UserName);
+                            if (!if_followexists && !if_Already_Freinds && !if_User_Is_Me)
                             {
                                 Console.WriteLine($"You Followed {userNameToFollow}");
                                 Console.WriteLine($"Now You can See {userNameToFollow}'s Posts and Comments!");
@@ -64,6 +65,10 @@ namespace Social_Networking.Model
                                 {
                                     Console.WriteLine($"You Are Already Friends With {userToFollow.UserName}!");
                                     break;
+                                }
+                                else if (if_User_Is_Me)
+                                {
+                                    Console.WriteLine($"Username '{userNameToFollow}' Matches Yours, You Cant Follow Yourself!");
                                 }
                                 else
                                 {

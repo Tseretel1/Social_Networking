@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Social_Networking.Data;
 
@@ -11,9 +12,11 @@ using Social_Networking.Data;
 namespace Social_Networking.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240221183734_comments likes")]
+    partial class commentslikes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,32 +158,6 @@ namespace Social_Networking.Migrations
                     b.ToTable("PostComments");
                 });
 
-            modelBuilder.Entity("Social_Networking.Model.PostLikesCount", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<bool>("Like")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("postID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("userID")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("PostLikes");
-                });
-
             modelBuilder.Entity("Social_Networking.Posts", b =>
                 {
                     b.Property<int>("ID")
@@ -208,6 +185,9 @@ namespace Social_Networking.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PostCommentsID")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -216,6 +196,8 @@ namespace Social_Networking.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("PostCommentsID");
 
                     b.ToTable("Post");
                 });
@@ -281,6 +263,13 @@ namespace Social_Networking.Migrations
                         .HasForeignKey("UserID");
                 });
 
+            modelBuilder.Entity("Social_Networking.Posts", b =>
+                {
+                    b.HasOne("Social_Networking.Model.PostComments", null)
+                        .WithMany("Posts_List")
+                        .HasForeignKey("PostCommentsID");
+                });
+
             modelBuilder.Entity("Social_Networking.Model.Friends", b =>
                 {
                     b.Navigation("Users_Friends");
@@ -289,6 +278,11 @@ namespace Social_Networking.Migrations
             modelBuilder.Entity("Social_Networking.Model.Messages", b =>
                 {
                     b.Navigation("Message_List");
+                });
+
+            modelBuilder.Entity("Social_Networking.Model.PostComments", b =>
+                {
+                    b.Navigation("Posts_List");
                 });
 
             modelBuilder.Entity("Social_Networking.User", b =>

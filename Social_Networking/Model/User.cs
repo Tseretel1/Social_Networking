@@ -29,6 +29,7 @@ namespace Social_Networking
                 bool RegistrationBool = false;
                 while (!RegistrationBool)
                 {
+                    Console.Clear();
                     Console.WriteLine("Registration");
                     Console.WriteLine();
                     Console.Write("Enter username: ");
@@ -88,7 +89,7 @@ namespace Social_Networking
             try
             {
                 bool loginSuccessful = false;
-
+                Console.Clear();
                 while (!loginSuccessful)
                 {
                     Console.WriteLine("Login");
@@ -133,6 +134,7 @@ namespace Social_Networking
                         }
                     }
                 }
+                Console.Clear();
             }
             catch (Exception ex)
             {
@@ -142,6 +144,7 @@ namespace Social_Networking
         }
         public void ContentPreference()
         {
+            Console.Clear();
             bool TillExit = true;
             while (TillExit)
             {
@@ -163,18 +166,22 @@ namespace Social_Networking
                         case 1:
                             content = "Music";
                             Console.WriteLine($"Content Preference set to {content}");
+                            TillExit = false;
                             break;
                         case 2:
                             content = "Films";
                             Console.WriteLine($"Content Preference set to {content}");
+                            TillExit = false;
                             break;
                         case 3:
                             content = "Games";
                             Console.WriteLine($"Content Preference set to {content}");
+                            TillExit = false;
                             break;
                         case 4:
                             content = "";
                             Console.WriteLine($"Content Preference set to None");
+                            TillExit = false;
                             break;
                         case 5:
                             TillExit = false;
@@ -217,11 +224,9 @@ namespace Social_Networking
                 }
             }
         }
-        public void UserName_Password_Changing()
-        {
-        }
         public void Setings()
         {
+            Console.Clear();
             bool whilee = true; 
             while (whilee)
             {
@@ -230,24 +235,22 @@ namespace Social_Networking
                     Console.WriteLine("Settings");
                     Console.WriteLine();
                     Console.WriteLine("1. Content Preference");
-                    Console.WriteLine("2. Changing UserName & Password");
-                    Console.WriteLine("3. Exit!");
+                    Console.WriteLine("2. Exit!");
                     int Cce = Convert.ToInt32( Console.ReadLine());
 
                     switch (Cce) 
                     {
                         case 1:
                             ContentPreference();
-                            break;
+                            Console.Clear();
+                            break;                     
                         case 2:
-                            UserName_Password_Changing(); 
+                            whilee = false;
+                            Console.Clear();
                             break;
-                        case 3: whilee = false;
+                        default: whilee = false;
                             break;
                     }
-
-
-
                 }
 
 
@@ -259,6 +262,7 @@ namespace Social_Networking
         }
         public void ExitFromAccount()
         {
+            Console.Clear();
             string Usenrame = "";
             foreach(var user in Posts.Users_List)
             {

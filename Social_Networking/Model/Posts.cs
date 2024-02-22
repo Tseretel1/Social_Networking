@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Social_Networking.Data;
+using Social_Networking.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,73 +74,163 @@ namespace Social_Networking
 
                 using (var dbContext = new UserDbContext())
                 {
+                    var currentUser = Posts.Users_List.FirstOrDefault();
+
                     string contentPreference = "";
                     int CurrentUSerID = 0;
-                    foreach(var i in Users_List)
+                    foreach (var i in Users_List)
                     {
-                       CurrentUSerID = i.ID;
+                        CurrentUSerID = i.ID;
                     }
                     var UserContent = dbContext.Users.FirstOrDefault(u => u.ID == CurrentUSerID);
                     contentPreference = UserContent.Content;
+                    bool if_no_content_Preffered = dbContext.Users.Any(u => u.ID == CurrentUSerID && u.Content == "");
 
-                    if (contentPreference != "")
+                    var ForYou = (IEnumerable<Posts>)null;
+                    var Prefered_Content = dbContext.Post.Where(u => u.Content == contentPreference);
+                    var All_Content = dbContext.Post.ToList();
+
+                    var content = if_no_content_Preffered ? ForYou = All_Content : ForYou = Prefered_Content;
+
+                    int currentIndex = 0;
+                    int pageSize = 1;
+
+                    if (ForYou != null && ForYou.Any())
                     {
-                        var query = dbContext.Post.Where(u => u.Content == contentPreference);
-                        foreach (var post in query)
+                        bool exit = false;
+                        while (!exit)
                         {
                             Console.WriteLine();
-                            Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.Write($"{post.Username} :");
-                            Console.ResetColor();
-                            Console.Write($" Time {post.DateTime.TimeOfDay} Content");
-                            Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.WriteLine($" {post.Content}");
-                            Console.ResetColor();
-                            Console.WriteLine("");
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine($"-{post.Post}");
+                            Console.WriteLine("    Press Enter to scroll!");
+                            Console.WriteLine("    1.like 2.comment 3.exit");
                             Console.ResetColor();
-                            Console.WriteLine("");
-                        }
-                    }
-                    else if(contentPreference == "")
-                    {
-                        var GetEveryPost = dbContext.Post.Where(u=> u.Content == u.Content);
-                        string PostContent = "";
-                        foreach (var post in GetEveryPost)
-                        {
-                            if(post.Content == "")
+                            int Postid = 0;
+                            var currentPosts = ForYou.Skip(currentIndex).Take(pageSize);
+                            foreach (var post in currentPosts)
+                            {;
+                                Console.WriteLine();
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                Console.Write("    Post:");
+                                Console.ResetColor();
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                Console.Write($"  {post.Username} :");
+                                Console.ResetColor();
+                                Console.Write($" Time {post.DateTime.TimeOfDay}");
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                Console.WriteLine($" {post.Content}");
+                                Console.ResetColor();
+                                Console.WriteLine("");
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine($"    - {post.Post}");
+                                Console.ResetColor();
+                                Console.WriteLine("    _______________________________");
+                                Postid = post.ID;
+
+                                var like = "";
+                                var r = Console.ForegroundColor = ConsoleColor.Cyan;
+                                bool Likedornot = dbContext.PostLikes.Any(u => u.postID == Postid && u.Like == true && u.userID == currentUser.ID);
+                                var Color = Likedornot ? r = ConsoleColor.Cyan : r = ConsoleColor.White;
+                                var LikeedText  = Likedornot ? like = "Liked" : like = "like";
+                                var likeCount = dbContext.PostLikes.Count(u => u.postID == Postid && u.Like == true);
+                                var comments = dbContext.PostComments.Where(u => u.PostId == Postid).ToList();
+
+                                Console.ForegroundColor = r;
+                                Console.WriteLine($"    {like}: {likeCount}");
+                                Console.ResetColor();
+                                Console.WriteLine();
+
+                                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                                Console.WriteLine("    Comments");
+                                Console.ResetColor();
+                                Console.WriteLine("");
+
+                                foreach (var comment in comments)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                                    Console.Write($"        {comment.Username}: ");
+                                    Console.ResetColor();
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                    Console.WriteLine($"{comment.Comment}");
+                                    Console.ResetColor();
+                                }
+
+                            }
+                            string input = Console.ReadLine();
+
+                            if (input.ToLower() == "1")
                             {
-                                PostContent = "None";
+                                Console.Clear();
+                                currentIndex = currentIndex;
+                                bool Likedornot = dbContext.PostLikes.Any(u => u.postID == Postid && u.Like == true && u.userID == currentUser.ID);
+
+                                if (Likedornot)
+                                {
+                                    var existingLike = dbContext.PostLikes.FirstOrDefault(u => u.postID == Postid && u.Like == true && u.userID == currentUser.ID);
+                                    existingLike.Like = false;
+                                    dbContext.SaveChanges();
+                                }
+
+                                else
+                                {
+                                    PostLikesCount p = new PostLikesCount();
+                                    p.Like = true;
+                                    p.postID = Postid;
+                                    p.userID = currentUser.ID;
+                                    p.UserName = currentUser.UserName;
+                                    dbContext.PostLikes.Add(p);
+                                    dbContext.SaveChanges();
+                                }
+                            }
+
+                            else if (input.ToLower() == "2")
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                Console.Write($"        {currentUser.UserName}:");
+                                Console.ResetColor();
+                                string comment = Console.ReadLine();
+                                PostComments p = new PostComments();
+                                p.Comment = comment;
+                                p.PostId = Postid;
+                                p.UserID = currentUser.ID;
+                                p.Username = currentUser.UserName;
+                                dbContext.PostComments.Add(p);
+                                dbContext.SaveChanges();
+                                Console.Clear();
+                                currentIndex = currentIndex;
+                            }
+                            else if(input.ToLower() == "3")
+                            {
+                                exit = true;
+                                Console.Clear();
                             }
                             else
                             {
-                                PostContent = post.Content;
+                                currentIndex += pageSize;
+                                if (currentIndex >= ForYou.Count())
+                                {
+                                    Console.WriteLine("You've reached the end of the posts.");
+                                    Console.WriteLine();
+                                    Console.WriteLine("Press Enter to exit.");
+                                    Console.ReadLine();
+                                    exit = true;
+                                    Console.Clear();
+                                }
                             }
-                            Console.WriteLine();
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write($"{post.Username} :");
-                            Console.ResetColor();
-                            Console.Write($" Time {post.DateTime.TimeOfDay} Content");
-                            Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.WriteLine($" {PostContent}");
-                            Console.ResetColor();
-                            Console.WriteLine("");
-                            Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine($"-{post.Post}");
-                            Console.ResetColor();
-                            Console.WriteLine("");
                         }
                     }
-                }
+                    else
+                    {
+                        Console.WriteLine("No posts to display.");
+                    }
 
-            }
+                }
+                }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
-
         public void Delete_My_Post()
         {
             try
@@ -260,6 +351,16 @@ namespace Social_Networking
                 {
                     Console.WriteLine("Post: ");
                     string Status = Console.ReadLine();
+                    if (Status == "")
+                    {
+                        Console.Clear();
+                        Console.WriteLine();
+                        Console.WriteLine("You cant Write empty Post");
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        bool ifexit = true;
                         Console.WriteLine();
                         Console.WriteLine("What Content Is Your Post?");
                         Console.WriteLine();
@@ -276,51 +377,69 @@ namespace Social_Networking
                         {
                             case 1:
                                 content = "Music";
+                                Console.Clear();
                                 break;
                             case 2:
                                 content = "Films";
+                                Console.Clear();
                                 break;
                             case 3:
                                 content = "Games";
+                                Console.Clear();
                                 break;
                             case 4:
                                 content = "";
+                                Console.Clear();
+
+                                break;
+                            case 5:
+                                ifexit = false;
                                 break;
                             default:
                                 Console.WriteLine("Invalid choice. Please choose a number between 1 and 4.");
-                                break;                               
+                                Console.Clear();
+                                break;
                         }
 
-                    string Username = "";
-                    string name = "";
-                    string lastname = "";
-                    string email = "";
-                    int age = 0;
-                    int user_id = 0;
-                    foreach (var item in Users_List)
-                    {
-                        Username = item.UserName;
-                        name = item.Name;
-                        lastname = item.Lastaname;
-                        age = item.Age;
-                        email = item.Email;
-                        user_id = item.ID;
+                        if (ifexit) 
+                        {
+                            string Username = "";
+                            string name = "";
+                            string lastname = "";
+                            string email = "";
+                            int age = 0;
+                            int user_id = 0;
+                            foreach (var item in Users_List)
+                            {
+                                Username = item.UserName;
+                                name = item.Name;
+                                lastname = item.Lastaname;
+                                age = item.Age;
+                                email = item.Email;
+                                user_id = item.ID;
+                            }
+                            var post = new Posts()
+                            {
+                                Post = Status,
+                                UserId = user_id,
+                                Name = name,
+                                LastName = lastname,
+                                Username = Username,
+                                DateTime = DateTime.Now,
+                                Content = content
+                            };
+                            context.Post.Add(post);
+                            context.SaveChanges();
+                            Console.WriteLine($"{Username} Content {content}");
+                            Console.WriteLine();
+                            Console.WriteLine($"   {Status}");
+                        }
+                        else if(!ifexit)
+                        {
+                            Console.Clear();
+                        }
+                       
                     }
-                    var post = new Posts()
-                    {
-                        Post = Status,
-                        UserId = user_id,
-                        Name = name,
-                        LastName = lastname,                       
-                        Username = Username,    
-                        DateTime = DateTime.Now,
-                        Content = content
-                    };
-                    context.Post.Add(post);
-                    context.SaveChanges();
-                    Console.WriteLine($"{Username} Content {content}");
-                    Console.WriteLine();
-                    Console.WriteLine($"   {Status}");
                 }
             }
             catch (Exception ex)

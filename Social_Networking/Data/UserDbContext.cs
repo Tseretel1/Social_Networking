@@ -17,6 +17,8 @@ namespace Social_Networking.Data
         public DbSet<Friends> Friends { get; set; }
         public DbSet<FollowUsers> Follows { get; set; }
         public DbSet<Messages> Messages { get; set; }
+        public DbSet<PostComments>PostComments { get; set; }
+        public DbSet<PostLikesCount>PostLikes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

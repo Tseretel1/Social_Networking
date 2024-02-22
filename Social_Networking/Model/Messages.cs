@@ -26,29 +26,39 @@ namespace Social_Networking.Model
         {
             try
             {
-                Colecting_data(); using (var dbContext = new UserDbContext())
+                Colecting_data();
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("  My Friends!");
+                Console.ResetColor();
+                Console.WriteLine();
+                using (var dbContext = new UserDbContext())
                 {
                     foreach (var item in ListClass.MessageCount)
                     {
                         var friend = dbContext.Users.FirstOrDefault(u => u.ID == item.FriendID);
                         if (friend != null)
                         {
+                            var Notification = item.FriendMessageCount.ToString();
+                            var empty = "";
                             var onlineColor = friend.isonline == true ? ConsoleColor.Green : ConsoleColor.Red;
+                            var IF_Notification_exists = item.FriendMessageCount > 0 ? item.FriendMessageCount.ToString() : Notification = "";
+                            var countColor33 = item.FriendMessageCount > 0 ? empty = "+" :  empty = "";
 
-                            var countColor = item.FriendMessageCount > 0 ? ConsoleColor.DarkGreen : ConsoleColor.Red;
-
-                            Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.Write($"{item.FriendID} ");
-                            Console.ResetColor();
                             Console.ForegroundColor = ConsoleColor.White;
-                            Console.Write($"{item.FriendName}");
+                            Console.Write($"  {item.FriendName}");
                             Console.ResetColor();
                             Console.ForegroundColor = onlineColor;
                             Console.Write("°");
                             Console.ResetColor();
-                            Console.ForegroundColor = countColor;
-                            Console.WriteLine($" + {item.FriendMessageCount}");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write($"   {empty}{Notification}");
                             Console.ResetColor();
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"           ID {item.FriendID}  ");
+                            Console.ResetColor();
+                            Console.WriteLine("___________________________________");
+                            Console.WriteLine();
                         }
                     }
                 }
@@ -114,11 +124,15 @@ namespace Social_Networking.Model
             {
                 using (var dbContext = new UserDbContext())
                 {
-                    Console.WriteLine("Enter User ID To Start Chatting!");
+                    bool Conversation = false;
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine("  Enter User ID To Start Chatting!");
                     int FriendID = Convert.ToInt32(Console.ReadLine());
                     var currentUser = Posts.Users_List.FirstOrDefault();
+                    bool If_IS_Friend = dbContext.Friends.Any(u => u.UserId1 == FriendID && u.UserId2 == currentUser.ID || u.UserId2 == FriendID && u.UserId1 == currentUser.ID);
                     var friendMessages = dbContext.Messages.Where(u => (u.SenderID == currentUser.ID && u.RecieverID == FriendID) || (u.SenderID == FriendID && u.RecieverID == currentUser.ID));
-                    if (!friendMessages.Any())
+                    if (!friendMessages.Any() && If_IS_Friend)
                     {
                         Console.WriteLine();
                         Console.WriteLine("       Start Chatting");
@@ -126,61 +140,78 @@ namespace Social_Networking.Model
                     }
                     else
                     {
-                        var Message_Count_Clear = dbContext.Messages.Where(u => u.SenderID == FriendID && u.RecieverID == currentUser.ID);
+                        if (If_IS_Friend)
+                        {
+                            Console.Clear();
+                            var Message_Count_Clear = dbContext.Messages.Where(u => u.SenderID == FriendID && u.RecieverID == currentUser.ID);
 
-                        foreach (var item in Message_Count_Clear)
-                        {
-                            item.Seen = true;
-                        }
-                        dbContext.SaveChanges();
-                        foreach (var item in friendMessages)
-                        {
+                            foreach (var item in Message_Count_Clear)
+                            {
+                                item.Seen = true;
+                            }
+                            dbContext.SaveChanges();
                             Console.WriteLine();
-                            if (item.SenderID == FriendID && item.RecieverID == currentUser.ID)
+                            Console.WriteLine($"Chat");
+                            Console.WriteLine();
+                            foreach (var item in friendMessages)
                             {
-                                Console.WriteLine();
-                                Console.ForegroundColor = ConsoleColor.Blue;
-                                Console.WriteLine($"- {item.Message}");
+                                if (item.SenderID == FriendID && item.RecieverID == currentUser.ID)
+                                {
+                                    Console.WriteLine();
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine($"- {item.Message}");
+                                }
+                                else if (item.SenderID == currentUser.ID && item.RecieverID == FriendID)
+                                {
+                                    Console.WriteLine();
+                                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                    Console.WriteLine($"          - {item.Message}");
+                                }
                             }
-                            else if (item.SenderID == currentUser.ID && item.RecieverID == FriendID)
-                            {
-                                Console.WriteLine();
-                                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                Console.WriteLine($"          - {item.Message}");
-                            }
-                        }
-
-                    }
-                    bool Till_exit = true;
-                    while (Till_exit)
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine();
-                        Console.Write("          - ");
-                        string typeMessgae = Console.ReadLine();
-                        Console.ResetColor();
-                        var FriendsONot = dbContext.Users.SingleOrDefault(u => u.ID == FriendID);
-                        if (typeMessgae == "")
-                        {
-                            Till_exit = false;
+                            Conversation = true;
                         }
                         else
                         {
-                            var message = new Messages()
+                            Console.WriteLine();
+                            Console.WriteLine("Id Doesnot Match Any of your Friends!");
+                            Console.WriteLine();
+                        }
+
+                    }
+                    if (Conversation)
+                    {
+                        bool Till_exit = true;
+                        while (Till_exit)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine();
+                            Console.Write("          - ");
+                            string typeMessgae = Console.ReadLine();
+                            Console.ResetColor();
+                            var FriendsONot = dbContext.Users.SingleOrDefault(u => u.ID == FriendID);
+                            if (typeMessgae == "")
                             {
-                                SenderID = currentUser.ID,
-                                RecieverID = FriendID,
-                                SenderUsername = currentUser.UserName,
-                                RecieverUserName = FriendsONot.UserName,
-                                Message = typeMessgae,
-                                Seen = false,
-                            };
-                            dbContext.Messages.Add(message);
-                            dbContext.SaveChanges();
+                                Till_exit = false;
+                                Console.Clear();
+                            }
+                            else
+                            {
+                                var message = new Messages()
+                                {
+                                    SenderID = currentUser.ID,
+                                    RecieverID = FriendID,
+                                    SenderUsername = currentUser.UserName,
+                                    RecieverUserName = FriendsONot.UserName,
+                                    Message = typeMessgae,
+                                    Seen = false,
+                                };
+                                dbContext.Messages.Add(message);
+                                dbContext.SaveChanges();
+                            }
                         }
                     }
                 }
-            }
+            }           
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);

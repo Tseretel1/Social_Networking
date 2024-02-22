@@ -120,27 +120,35 @@ public class Main_Functional
                 switch (PostChoice)
                 {
                     case 1:
+                        Console.Clear();
                         posts.For_You_Page();
                         break;
                     case 2:
+                        Console.Clear();
                         posts.Write_Post();
                         break;
                     case 3:
+                        Console.Clear();
                         posts.Delete_My_Post();
                         break;
                     case 4:
+                        Console.Clear();
                         posts.See_My_Posts();
                         break;
                     case 5:
+                        Console.Clear();
                         user1.Setings();
                         break;
                     case 6:
+                        Console.Clear();
                         friends.Friends_Adjustment();
                         break;
                     case 7:
+                        Console.Clear();
                         messages.Chat_Display();
                         break;
                     case 8:
+                        Console.Clear();
                         user1.ExitFromAccount();
                         whilee = false;
                         break;
